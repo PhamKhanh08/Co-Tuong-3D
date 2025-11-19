@@ -1,3 +1,5 @@
+package model;
+
 public abstract class Piece {
     // 1. Thuộc tính chung mà quân cờ nào cũng phải có
     public int x;               // Tọa độ ngang (0-8)
