@@ -27,5 +27,5 @@ public class Chariot extends Piece {
         return false;
     }
     // Lưu ý: Hiện tại hàm chỉ kiểm tra "Hình dáng" đường đi.
-    // Việc kiểm tra đường đi có bị quân khác chặn hay không sẽ xủ lí ở gai đoạn làm Bàn cờ (Board)
+    // Việc kiểm tra đường đi có bị quân khác chặn hay không sẽ xủ lí ở giai đoạn làm Bàn cờ (Board)
 }
