@@ -27,6 +27,11 @@ public abstract class Piece {
         this.y = TargetY;
     }
 
+    //Hàm bảo vệ. Kiểm tra quân cờ có cnaefm trong bàn cờ (9x10) không.
+    public boolean isWithinBoard(int TargetX, int TargetY) {
+        return TargetX >= 0 && TargetX <= 8 && TargetY >= 0 && TargetY <= 9;
+    }
+
     // 5. in thông tin quân cờ (Hỗ trợ Debug)
     @Override
     public String toString() {

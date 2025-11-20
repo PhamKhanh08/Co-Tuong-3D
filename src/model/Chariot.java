@@ -11,6 +11,11 @@ public class Chariot extends Piece {
     // 2. Định nghia luật đi: Xe đi thẳng hoặc đi ngang
     @Override
     public boolean isValidMove(int TargetX, int TargetY) {
+
+        if (!isWithinBoard(TargetX, TargetY)) {
+            return false;
+        }
+
         // Nếu đích đến trùng vị trí đang đứng --> Sai (không di chuyển)
         if(TargetX == this.x && TargetY == this.y) {
             return false;
