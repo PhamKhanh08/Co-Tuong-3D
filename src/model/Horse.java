@@ -22,4 +22,9 @@ public class Horse extends Piece {
         // Không phải chữ L --> Sai luật
         return false;
     }
+
+    @Override
+    public String getSymbol() {
+        return isRed ? "R_M" : "B_M"; // M = Mã
+    }
 }

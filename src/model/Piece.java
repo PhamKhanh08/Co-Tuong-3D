@@ -37,4 +37,7 @@ public abstract class Piece {
     public String toString() {
         return name + (isRed ? " Đỏ" : " Đen") + " [" + x + ", " + y + "]";
     }
+
+    // Hàm trừu tượng: Ép các con phải in ra Ký Hiệu đại diện (Để in ra màn hình)
+    public abstract String getSymbol();
 }

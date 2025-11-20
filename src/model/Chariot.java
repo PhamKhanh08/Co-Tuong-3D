@@ -31,6 +31,8 @@ public class Chariot extends Piece {
         // Nếu không phải ngang hay dọc --> Sai luật
         return false;
     }
-    // Lưu ý: Hiện tại hàm chỉ kiểm tra "Hình dáng" đường đi.
-    // Việc kiểm tra đường đi có bị quân khác chặn hay không sẽ xủ lí ở giai đoạn làm Bàn cờ (Board)
+    @Override
+    public String getSymbol() {
+        return isRed ? "R_X" : "B_X"; // R = Red, B = Black, X = Xe
+    }
 }
