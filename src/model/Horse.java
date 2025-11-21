@@ -6,7 +6,7 @@ public class Horse extends Piece {
     }
 
     @Override
-    public boolean isValidMove(int TargetX, int TargetY) {
+    public boolean isValidMove(int TargetX, int TargetY, Board Board) {
 
         if (!isWithinBoard(TargetX, TargetY)) {
             return false;

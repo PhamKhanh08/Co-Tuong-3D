@@ -19,7 +19,7 @@ public abstract class Piece {
     // 3. Phương thức trừu tượng (Abstract method)
     //Luật: Class cha ra lệnh đi (ko biết cách đi) và các class con sẽ đi theo cách đi của từng class
     // TargetX, TargetY là điểm đích muốn đến
-    public abstract boolean isValidMove(int TargetX, int TargetY);
+    public abstract boolean isValidMove(int TargetX, int TargetY, Board board);
 
     //4. Hàm di chuyển chung (Thay đổi tọa độ)
     public void move(int TargetX, int TargetY) {
@@ -27,7 +27,7 @@ public abstract class Piece {
         this.y = TargetY;
     }
 
-    //Hàm bảo vệ. Kiểm tra quân cờ có cnaefm trong bàn cờ (9x10) không.
+    //Hàm bảo vệ. Kiểm tra quân cờ có nằm trong bàn cờ (9x10) không.
     public boolean isWithinBoard(int TargetX, int TargetY) {
         return TargetX >= 0 && TargetX <= 8 && TargetY >= 0 && TargetY <= 9;
     }

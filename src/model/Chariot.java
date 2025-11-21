@@ -10,7 +10,7 @@ public class Chariot extends Piece {
 
     // 2. Định nghia luật đi: Xe đi thẳng hoặc đi ngang
     @Override
-    public boolean isValidMove(int TargetX, int TargetY) {
+    public boolean isValidMove(int TargetX, int TargetY, Board board) {
 
         if (!isWithinBoard(TargetX, TargetY)) {
             return false;
@@ -25,7 +25,15 @@ public class Chariot extends Piece {
         // - Hoặc là đi ngang (y giữ nguyên, x thay đổi)
         // - Hoặc là đi dọc (x giữ nguyên, y thay đổi)
         if(TargetX == this.x || TargetY == this.y) {
-            return true;
+            int obstacles = board.countObstacles(this.x, this.y, TargetX, TargetY);
+
+            // Luật của Xe: Đường đi phải thông thoáng (0 vật cản)
+            if (obstacles > 0) {
+                System.out.println("   [Xe] Lỗi: Có " + obstacles + " quân cản đường!");
+                return false; // Bị chặn -> Không đi được
+            }
+
+            return true; // Đường thông thoáng -> OK
         }
 
         // Nếu không phải ngang hay dọc --> Sai luật
