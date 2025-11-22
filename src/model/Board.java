@@ -4,6 +4,7 @@ public class Board {
     // Khởi tạo mảng 2 chiều 10 hàng 9 cột làm bàn cờ
     public Piece[][] grid;
 
+    public boolean gameOver = false; // true = Chiếu hết
     public boolean isRedTurn = true; // true = Lượt Đỏ, false = Lượt Đen
 
     public Board() {
@@ -104,16 +105,14 @@ public class Board {
     //Trả về true nếu đi thành công, false nếu đi lỗi
     public boolean executeMove(int startX, int startY, int endX, int endY) {
         Piece piece = grid[startY][startX];
-
+        if(gameOver) return false;      // HẾT game thì chặn di chuyển
         // 1. Kiểm tra ô xuất phát có quân nào không
         if(piece == null) {
-            System.out.println("Error! Ô này không có quân cờ nào!");
             return false;
         }
 
         // 2.Hỏi xem quân cờ nàu có đi đúng luật không (Tự check luôn có nhảy ra ngoài bàn cờ không)
         if(!piece.isValidMove(endX, endY, this)) {
-            System.out.println("Error! Nước đi sai luật của quân: " + piece.name);
             return false;
         }
 
@@ -122,16 +121,24 @@ public class Board {
         // Nếu ô đích có quân, và quân đó cùng màu --> Không được ăn (Cản đường)
         Piece targetPiece = grid[endY][endX];
         if(targetPiece != null && targetPiece.isRed == piece.isRed) {
-            System.out.println("Error! Không ăn quân cùng phe");
             return false;
         }
         // 4. Check luật đi
         if (piece.isRed != isRedTurn) {
-            System.out.println("Chưa đến lượt của bạn!");
             return false;
         }
-        // === Nếu thỏa hết điều kiện thì tiến hành di chuyển ===
 
+        Piece target = grid[endY][endX];
+        if (target != null && target.isRed == piece.isRed) return false;
+
+        // --- CHECK ĂN TƯỚNG (WIN CONDITION) ---
+        if (target != null && target instanceof General) {
+            gameOver = true; // Kết thúc game!
+            System.out.println("GAME OVER! Phe " + (piece.isRed ? "ĐỎ" : "ĐEN") + " thắng!");
+        }
+        // ---------------------------------------
+
+        // === Nếu thỏa hết điều kiện thì tiến hành di chuyển ===
         // Bước 1: cập nhật mảng grid (Xóa chỗ cũ, gán vào chỗ mới)
         grid[startY][startX] = null;    // Nhấc quân lên, chỗ cũ RỖNG
         grid[endY][endX] = piece;       // Đặt quân xuống đích
@@ -144,6 +151,13 @@ public class Board {
         isRedTurn = !isRedTurn;
 
         return true;    // Thành công
+    }
+    //  Hàm reset ván cờ
+    public void resetBoard() {
+        grid = new Piece[10][9]; // Xóa bàn cờ cũ
+        initStandardBoard();     // Xếp lại quân
+        isRedTurn = true;        // Đỏ đi trước
+        gameOver = false;        // Game chưa kết thúc
     }
 
     // Hàm đếm số quân cờ nằm GIỮA điểm xuất phát và đích đến
@@ -176,5 +190,67 @@ public class Board {
             }
         }
         return count;
+    }
+
+    // Chuyển bàn cờ hiện tại thành chuỗi FEN chuẩn quốc tế
+    public String getFen() {
+        StringBuilder sb = new StringBuilder();
+
+        // 1. Duyệt từng hàng từ 9 về 0 (FEN tính từ hàng trên cùng xuống)
+        // Lưu ý: Trong code của mình, hàng 0 là trên cùng (đen), hàng 9 là dưới cùng (đỏ).
+        // FEN chuẩn cũng đi từ hàng 0 đến hàng 9.
+        for (int y = 0; y < 10; y++) {
+            int emptyCount = 0;
+            for (int x = 0; x < 9; x++) {
+                Piece p = grid[y][x];
+
+                if (p == null) {
+                    emptyCount++;
+                } else {
+                    if (emptyCount > 0) {
+                        sb.append(emptyCount);
+                        emptyCount = 0;
+                    }
+                    // Lấy ký tự đại diện (Xe đỏ = R, Xe đen = r)
+                    sb.append(getFenChar(p));
+                }
+            }
+            if (emptyCount > 0) {
+                sb.append(emptyCount);
+            }
+            if (y < 9) {
+                sb.append("/"); // Dấu ngăn cách hàng
+            }
+        }
+
+        // 2. Thêm lượt đi (w = Red/Trắng đi, b = Black/Đen đi)
+        // Lưu ý: FEN quốc tế dùng 'w' (Red) và 'b' (Black)
+        sb.append(isRedTurn ? " w" : " b");
+
+        // 3. Các thông số phụ (tạm thời để mặc định)
+        // - - : Không có quyền nhập thành hay bắt tốt qua đường (không áp dụng cho cờ tướng nhưng cần có cho đủ format)
+        // 0 : Số nước đi không ăn quân/tốt (halfmove clock)
+        // 1 : Số thứ tự nước đi (fullmove number)
+        sb.append(" - - 0 1");
+
+        return sb.toString();
+    }
+
+    // Hàm phụ: Lấy ký tự FEN của từng quân
+    private char getFenChar(Piece p) {
+        // Lấy tên class để phân biệt chính xác loại quân
+        // (Dùng instanceof an toàn hơn check string name)
+        char c = ' ';
+
+        if (p instanceof Chariot) c = 'r';      // Rook (Xe)
+        else if (p instanceof Horse) c = 'n';   // Knight (Mã)
+        else if (p instanceof Elephant) c = 'b';// Elephant/Bishop (Tượng)
+        else if (p instanceof Advisor) c = 'a'; // Advisor (Sĩ)
+        else if (p instanceof General) c = 'k'; // King (Tướng)
+        else if (p instanceof Cannon) c = 'c';  // Cannon (Pháo)
+        else if (p instanceof Soldier) c = 'p'; // Pawn (Tốt)
+
+        // Quân Đỏ -> VIẾT HOA. Quân Đen -> viết thường
+        return p.isRed ? Character.toUpperCase(c) : c;
     }
 }
