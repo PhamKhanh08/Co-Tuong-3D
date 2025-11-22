@@ -4,6 +4,8 @@ public class Board {
     // Khởi tạo mảng 2 chiều 10 hàng 9 cột làm bàn cờ
     public Piece[][] grid;
 
+    public boolean isRedTurn = true; // true = Lượt Đỏ, false = Lượt Đen
+
     public Board() {
         grid = new Piece[10][9];
         initStandardBoard();    // Xếp quân ngay khi tạo bàn cờ
@@ -115,6 +117,7 @@ public class Board {
             return false;
         }
 
+
         // 3. Kiểm tra ăn quân (Friendly Fire)
         // Nếu ô đích có quân, và quân đó cùng màu --> Không được ăn (Cản đường)
         Piece targetPiece = grid[endY][endX];
@@ -122,7 +125,11 @@ public class Board {
             System.out.println("Error! Không ăn quân cùng phe");
             return false;
         }
-
+        // 4. Check luật đi
+        if (piece.isRed != isRedTurn) {
+            System.out.println("Chưa đến lượt của bạn!");
+            return false;
+        }
         // === Nếu thỏa hết điều kiện thì tiến hành di chuyển ===
 
         // Bước 1: cập nhật mảng grid (Xóa chỗ cũ, gán vào chỗ mới)
@@ -132,6 +139,9 @@ public class Board {
         // Bước 2: Cập nhật tọa độ trong quân cờ (Important!)
         // Quên cập nhật thì xác đi nhưng hồn còn đó=))
         piece.move(endX, endY);
+
+        // --- ĐỔI LƯỢT ---
+        isRedTurn = !isRedTurn;
 
         return true;    // Thành công
     }
