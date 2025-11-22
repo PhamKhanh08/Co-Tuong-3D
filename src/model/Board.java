@@ -22,6 +22,48 @@ public class Board {
         addPiece(new Horse(1, 0, false));       // Mã trái
         addPiece(new Horse(7, 0, false));       //Mã phải
         addPiece(new Chariot(8,0,false));       // Xe phải
+
+        // Pháo Đỏ (Hàng 7, Cột 1 và 7) - Lưu ý y=7 là hàng của Pháo đỏ (gần hàng 9)
+        addPiece(new Cannon(1, 7, true));
+        addPiece(new Cannon(7, 7, true));
+
+        // Pháo Đen (Hàng 2, Cột 1 và 7)
+        addPiece(new Cannon(1, 2, false));
+        addPiece(new Cannon(7, 2, false));
+
+        // --- THÊM 5 TỐT ĐỎ (Hàng 6 - tính theo index mảng, tức là dòng thứ 7 từ trên xuống) ---
+        // Vị trí: 0, 2, 4, 6, 8
+        for (int i = 0; i <= 8; i += 2) {
+            addPiece(new Soldier(i, 6, true));
+        }
+
+        // --- THÊM 5 TỐT ĐEN (Hàng 3) ---
+        for (int i = 0; i <= 8; i += 2) {
+            addPiece(new Soldier(i, 3, false));
+        }
+
+        // --- THÊM 4 CON TƯỢNG ---
+        // Tượng Đỏ
+        addPiece(new Elephant(2, 9, true));
+        addPiece(new Elephant(6, 9, true));
+
+        // Tượng Đen
+        addPiece(new Elephant(2, 0, false));
+        addPiece(new Elephant(6, 0, false));
+
+        // --- THÊM SĨ ---
+        // Sĩ Đỏ (Hàng 9, Cột 3 và 5)
+        addPiece(new Advisor(3, 9, true));
+        addPiece(new Advisor(5, 9, true));
+        // Sĩ Đen (Hàng 0, Cột 3 và 5)
+        addPiece(new Advisor(3, 0, false));
+        addPiece(new Advisor(5, 0, false));
+
+        // --- THÊM TƯỚNG (KING) ---
+        // Tướng Đỏ (Hàng 9, Cột 4 - Giữa cung)
+        addPiece(new General(4, 9, true));
+        // Tướng Đen (Hàng 0, Cột 4 - Giữa cung)
+        addPiece(new General(4, 0, false));
     }
 
     // Hàm phụ để đặt quân vào mảng
