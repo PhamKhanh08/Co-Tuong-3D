@@ -185,17 +185,58 @@ public class GamePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        // Bật chế độ khử răng cưa để hình vẽ tròn trịa, mượt mà
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // 1. Vẽ nền bàn cờ
         if (boardImage != null) g2d.drawImage(boardImage, 0, 0, getWidth(), getHeight(), null);
+
+        // 2. Vẽ thông báo
         drawTurnInfo(g2d);
+
+        // 3. Vẽ gợi ý nước đi (Nếu đang chọn quân)
         if (selectedPiece != null) drawValidMoves(g2d);
 
+        // 4. Vẽ các quân cờ lên bàn
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 9; x++) {
                 Piece p = board.grid[y][x];
                 if (p != null) drawSinglePiece(g2d, p, x, y);
             }
+        }
+
+        // 5. VẼ DẤU VẾT NƯỚC ĐI VỪA RỒI (QUAN TRỌNG: ĐỂ CUỐI CÙNG)
+        // Để xuống cuối để cái viền xanh ở vị trí mới được vẽ đè lên trên quân cờ.
+        drawLastMove(g2d);
+    }
+
+    // --- HÀM VẼ DẤU VẾT (HIGHLIGHT) - PHIÊN BẢN MỚI ---
+    private void drawLastMove(Graphics2D g2) {
+        // Chỉ vẽ khi đã có nước đi (tọa độ != -1)
+        if (board.lastSrcX != -1) {
+
+            // A. VẼ VỊ TRÍ CŨ (Nơi đi) -> Chấm xanh lá nhỏ ở tâm
+            int srcX = START_X + board.lastSrcX * GAP_X;
+            int srcY = START_Y + board.lastSrcY * GAP_Y;
+
+            // Sử dụng màu xanh lá cây, hơi trong suốt giống chấm gợi ý
+            g2.setColor(new Color(0, 200, 0, 150));
+            int dotSize = 16; // Kích thước chấm tròn (to hơn chấm gợi ý 1 xíu cho rõ)
+            // Vẽ hình tròn đặc tại tâm
+            g2.fillOval(srcX - dotSize/2, srcY - dotSize/2, dotSize, dotSize);
+
+            // B. VẼ VỊ TRÍ MỚI (Nơi đến) -> Viền tròn xanh lá bao quanh quân cờ
+            int dstX = START_X + board.lastDstX * GAP_X;
+            int dstY = START_Y + board.lastDstY * GAP_Y;
+
+            g2.setColor(Color.GREEN); // Màu xanh lá tươi
+            g2.setStroke(new BasicStroke(3)); // Nét vẽ dày 3px cho nổi bật
+
+            // Kích thước vòng tròn: Lớn hơn quân cờ một chút để tạo khoảng hở đẹp mắt
+            // PIECE_SIZE = 55, ta vẽ vòng cỡ 62 là đẹp
+            int ringSize = PIECE_SIZE + 7;
+            // Vẽ đường viền tròn
+            g2.drawOval(dstX - ringSize/2, dstY - ringSize/2, ringSize, ringSize);
         }
     }
 
