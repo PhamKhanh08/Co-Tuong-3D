@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Co Tuong:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Co_Tuong_jar</output-path>
+    <root id="archive" name="Co Tuong.jar">
+      <element id="module-output" name="Co Tuong" />
+    </root>
+  </artifact>
+</component>
