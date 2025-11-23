@@ -75,9 +75,9 @@ public class Board {
         grid[endY][endX] = piece;
         piece.move(endX, endY);
 
-        /* Âm thanh
+        // Âm thanh
         if (target != null) view.SoundManager.play("capture.wav");
-        else view.SoundManager.play("move.wav");*/
+        else view.SoundManager.play("move.wav");
 
         // Lưu vết
         lastSrcX = startX; lastSrcY = startY;
@@ -102,7 +102,7 @@ public class Board {
     private void endGame(boolean redWins) {
         state = redWins ? STATE_RED_WIN : STATE_BLACK_WIN;
         System.out.println("GAME OVER! " + (redWins ? "ĐỎ" : "ĐEN") + " THẮNG!");
-        //view.SoundManager.play("win.wav");
+        view.SoundManager.play("win.wav");
     }
 
     // --- HÀM MỚI: KIỂM TRA XEM CÓ CÒN NƯỚC ĐI HỢP LỆ KHÔNG ---
