@@ -1,279 +1,205 @@
 package model;
+import java.util.Random;
 
 public class Board {
-    // Khởi tạo mảng 2 chiều 10 hàng 9 cột làm bàn cờ
     public Piece[][] grid;
 
-    public boolean gameOver = false; // true = Chiếu hết
-    public boolean isRedTurn = true; // true = Lượt Đỏ, false = Lượt Đen
+    // --- QUẢN LÝ TRẠNG THÁI GAME ---
+    public static final int STATE_PLAYING = 0;
+    public static final int STATE_RED_WIN = 1;
+    public static final int STATE_BLACK_WIN = 2;
+    public static final int STATE_DRAW = 3; // Hòa (nếu cần sau này)
 
-    public int lastSrcX = -1;
-    public int lastSrcY = -1;
-    public int lastDstX = -1;
-    public int lastDstY = -1;
+    public int state = STATE_PLAYING;
+    public boolean isRedTurn = true;
+
+    // Biến lưu vết
+    public int lastSrcX = -1, lastSrcY = -1, lastDstX = -1, lastDstY = -1;
 
     public Board() {
         grid = new Piece[10][9];
-        initStandardBoard();    // Xếp quân ngay khi tạo bàn cờ
+        initStandardBoard();
     }
 
-    // Hàm xếp quân cờ vào vị trí ban đầu
     public void initStandardBoard() {
-        // --- PHE ĐỎ (Ở dưới, y = 9) ---
-        addPiece(new Chariot(0, 9, true));      // Xe trái
-        addPiece(new Horse(1, 9, true));        // Mã trái
-        addPiece(new Horse(7, 9, true));        // Mã phải
-        addPiece(new Chariot(8,9,true));        // Xe phải
+        // ... (Giữ nguyên phần khởi tạo quân cờ cũ của bạn) ...
+        // Để ngắn gọn, tôi không paste lại đoạn addPiece dài dòng.
+        // Bạn cứ giữ nguyên code trong hàm này nhé.
+        addPiece(new Chariot(0, 9, true)); addPiece(new Horse(1, 9, true));
+        addPiece(new Elephant(2, 9, true)); addPiece(new Advisor(3, 9, true));
+        addPiece(new General(4, 9, true)); addPiece(new Advisor(5, 9, true));
+        addPiece(new Elephant(6, 9, true)); addPiece(new Horse(7, 9, true));
+        addPiece(new Chariot(8, 9, true));
+        addPiece(new Cannon(1, 7, true)); addPiece(new Cannon(7, 7, true));
+        for (int i = 0; i <= 8; i += 2) addPiece(new Soldier(i, 6, true));
 
-        // --- PHE XANH (Ở trên, y = 0) ---
-        addPiece(new Chariot(0, 0, false));     // Xe trái
-        addPiece(new Horse(1, 0, false));       // Mã trái
-        addPiece(new Horse(7, 0, false));       //Mã phải
-        addPiece(new Chariot(8,0,false));       // Xe phải
-
-        // Pháo Đỏ (Hàng 7, Cột 1 và 7) - Lưu ý y=7 là hàng của Pháo đỏ (gần hàng 9)
-        addPiece(new Cannon(1, 7, true));
-        addPiece(new Cannon(7, 7, true));
-
-        // Pháo Đen (Hàng 2, Cột 1 và 7)
-        addPiece(new Cannon(1, 2, false));
-        addPiece(new Cannon(7, 2, false));
-
-        // --- THÊM 5 TỐT ĐỎ (Hàng 6 - tính theo index mảng, tức là dòng thứ 7 từ trên xuống) ---
-        // Vị trí: 0, 2, 4, 6, 8
-        for (int i = 0; i <= 8; i += 2) {
-            addPiece(new Soldier(i, 6, true));
-        }
-
-        // --- THÊM 5 TỐT ĐEN (Hàng 3) ---
-        for (int i = 0; i <= 8; i += 2) {
-            addPiece(new Soldier(i, 3, false));
-        }
-
-        // --- THÊM 4 CON TƯỢNG ---
-        // Tượng Đỏ
-        addPiece(new Elephant(2, 9, true));
-        addPiece(new Elephant(6, 9, true));
-
-        // Tượng Đen
-        addPiece(new Elephant(2, 0, false));
-        addPiece(new Elephant(6, 0, false));
-
-        // --- THÊM SĨ ---
-        // Sĩ Đỏ (Hàng 9, Cột 3 và 5)
-        addPiece(new Advisor(3, 9, true));
-        addPiece(new Advisor(5, 9, true));
-        // Sĩ Đen (Hàng 0, Cột 3 và 5)
-        addPiece(new Advisor(3, 0, false));
-        addPiece(new Advisor(5, 0, false));
-
-        // --- THÊM TƯỚNG (KING) ---
-        // Tướng Đỏ (Hàng 9, Cột 4 - Giữa cung)
-        addPiece(new General(4, 9, true));
-        // Tướng Đen (Hàng 0, Cột 4 - Giữa cung)
-        addPiece(new General(4, 0, false));
+        addPiece(new Chariot(0, 0, false)); addPiece(new Horse(1, 0, false));
+        addPiece(new Elephant(2, 0, false)); addPiece(new Advisor(3, 0, false));
+        addPiece(new General(4, 0, false)); addPiece(new Advisor(5, 0, false));
+        addPiece(new Elephant(6, 0, false)); addPiece(new Horse(7, 0, false));
+        addPiece(new Chariot(8, 0, false));
+        addPiece(new Cannon(1, 2, false)); addPiece(new Cannon(7, 2, false));
+        for (int i = 0; i <= 8; i += 2) addPiece(new Soldier(i, 3, false));
     }
 
-    // Hàm phụ để đặt quân vào mảng
     private void addPiece(Piece p) {
         grid[p.y][p.x] = p;
     }
 
-    // Hàm vẽ bàn cờ ra màn hình Console
-    public void printBoard() {
-        System.out.println("   0   1   2   3   4   5   6   7   8");
-        System.out.println(" +---+---+---+---+---+---+---+---+---+");
-
-        for(int y = 0; y < 10; y++) {
-            System.out.print(y + "|");
-            for(int x = 0; x < 9; x++) {
-                Piece p = grid[y][x];
-                if(p != null) {
-                    System.out.print(p.getSymbol() + "|");
-                }
-                else {
-                    System.out.print(" . |");
-                }
-            }
-            System.out.println();
-
-            // Vẽ khu vực sông
-            if(y == 4) {
-                System.out.println(" | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ | Sông Hà");
-            } else {
-                System.out.println(" +---+---+---+---+---+---+---+---+---+");
-            }
-        }
-    }
-
-    // Hàm thực hiện nước đi trên bàn cờ
-    //Trả về true nếu đi thành công, false nếu đi lỗi
     public boolean executeMove(int startX, int startY, int endX, int endY) {
-        if (gameOver) return false;
+        if (state != STATE_PLAYING) return false;
 
         Piece piece = grid[startY][startX];
         if (piece == null) return false;
-
-        // 1. Check lượt đi
         if (piece.isRed != isRedTurn) return false;
 
-        // 2. Check luật đi cơ bản của quân cờ
         if (!piece.isValidMove(endX, endY, this)) return false;
 
-        // 3. Check ăn quân cùng màu
+        // Chặn nước đi tự sát (Lộ mặt tướng hoặc vẫn bị chiếu)
+        if (isKingInDangerAfterMove(piece, endX, endY)) {
+            System.out.println("Lỗi: Nước đi không hợp lệ (Tướng bị chiếu)!");
+            return false;
+        }
+
         Piece target = grid[endY][endX];
         if (target != null && target.isRed == piece.isRed) return false;
 
-        // ---KIỂM TRA XEM ĐI XONG TƯỚNG CÓ CHẾT KHÔNG ---
-        // Nếu nước đi này làm lộ mặt tướng hoặc vẫn để tướng bị chiếu -> KHÔNG ĐƯỢC ĐI
-        if (isKingInDangerAfterMove(piece, endX, endY)) {
-            System.out.println("Lỗi: Nước đi không hợp lệ! Tướng đang bị chiếu!");
-            // Phát âm thanh cảnh báo (nếu muốn)
-            return false;
-        }
-        // ------------------------------------------------------------------
-
-        // Check Win (Ăn Tướng)
+        // Check ăn trực tiếp Tướng (Trường hợp hiếm nhưng cứ để)
         if (target != null && target instanceof General) {
-            gameOver = true;
-            System.out.println("GAME OVER!");
-            //view.SoundManager.play("win.wav");
+            endGame(piece.isRed);
+            return true;
         }
 
-        // THỰC HIỆN DI CHUYỂN THẬT
+        // === DI CHUYỂN ===
         grid[startY][startX] = null;
         grid[endY][endX] = piece;
         piece.move(endX, endY);
 
         /* Âm thanh
-        boolean isCapture = (target != null);
-        if (isCapture) {
-            view.SoundManager.play("capture.wav");
-        } else {
-            view.SoundManager.play("move.wav");
-        }*/
+        if (target != null) view.SoundManager.play("capture.wav");
+        else view.SoundManager.play("move.wav");*/
 
         // Lưu vết
         lastSrcX = startX; lastSrcY = startY;
         lastDstX = endX; lastDstY = endY;
 
+        // Đổi lượt
         isRedTurn = !isRedTurn;
+
+        // ---  KIỂM TRA HẾT CỜ (CHECKMATE/STALEMATE) NGAY SAU KHI ĐỔI LƯỢT  ---
+        // Đến lượt phe kia, kiểm tra xem phe kia có còn nước đi nào không?
+        if (!hasLegalMoves(isRedTurn)) {
+            // Nếu đến lượt Đỏ mà Đỏ không đi được -> Đỏ Thua (Đen Thắng)
+            // Nếu đến lượt Đen mà Đen không đi được -> Đen Thua (Đỏ Thắng)
+            endGame(!isRedTurn);
+        }
+        // --------------------------------------------------------------------------
+
         return true;
     }
 
-    // ----------------------------------------------------------------
-    // CÁC HÀM HỖ TRỢ LOGIC CHỐNG TỰ SÁT
-    // ----------------------------------------------------------------
-
-    /**
-     * Giả lập nước đi và kiểm tra xem Tướng phe mình có bị ăn không
-     */
-    private boolean isKingInDangerAfterMove(Piece piece, int endX, int endY) {
-        // 1. Sao lưu trạng thái cũ
-        int startX = piece.x;
-        int startY = piece.y;
-        Piece originalTarget = grid[endY][endX]; // Quân bị ăn (nếu có)
-
-        // 2. Di chuyển thử (Giả vờ)
-        grid[startY][startX] = null;
-        grid[endY][endX] = piece;
-        piece.x = endX;
-        piece.y = endY;
-
-        // 3. Kiểm tra: Sau khi đi xong, Tướng phe mình có bị ai chiếu không?
-        boolean inDanger = isKingChecked(piece.isRed);
-
-        // 4. Hoàn trả trạng thái cũ (Undo move)
-        piece.x = startX;
-        piece.y = startY;
-        grid[startY][startX] = piece;
-        grid[endY][endX] = originalTarget;
-
-        return inDanger; // Trả về true nếu nước đi này là tự sát
+    // Hàm xử lý kết thúc game
+    private void endGame(boolean redWins) {
+        state = redWins ? STATE_RED_WIN : STATE_BLACK_WIN;
+        System.out.println("GAME OVER! " + (redWins ? "ĐỎ" : "ĐEN") + " THẮNG!");
+        //view.SoundManager.play("win.wav");
     }
 
-    /*
-     * Kiểm tra xem Tướng của phe 'isRed' có đang bị quân địch chiếu không
-     */
+    // --- HÀM MỚI: KIỂM TRA XEM CÓ CÒN NƯỚC ĐI HỢP LỆ KHÔNG ---
+    public boolean hasLegalMoves(boolean checkRed) {
+        // Duyệt tất cả quân cờ của phe 'checkRed'
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 9; x++) {
+                Piece p = grid[y][x];
+                if (p != null && p.isRed == checkRed) {
+                    // Với mỗi quân, thử đi vào TẤT CẢ các ô trên bàn cờ
+                    for (int ty = 0; ty < 10; ty++) {
+                        for (int tx = 0; tx < 9; tx++) {
+                            // 1. Check luật đi cơ bản
+                            if (p.isValidMove(tx, ty, this)) {
+                                // 2. Check xem ô đích có bị chặn bởi quân mình không
+                                Piece target = grid[ty][tx];
+                                if (target != null && target.isRed == p.isRed) continue;
+
+                                // 3. Check xem đi xong có bị chết Tướng không
+                                if (!isKingInDangerAfterMove(p, tx, ty)) {
+                                    return true; // Vẫn còn ít nhất 1 nước đi -> Sống
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false; // Đã thử hết mọi nước mà không đi được -> CHẾT
+    }
+
+    public void resetBoard() {
+        grid = new Piece[10][9];
+        initStandardBoard();
+
+        // RANDOM LƯỢT: 50% Đỏ, 50% Đen
+        isRedTurn = new Random().nextBoolean();
+
+        state = STATE_PLAYING;
+        lastSrcX = -1; lastSrcY = -1; lastDstX = -1; lastDstY = -1;
+    }
+
+    private boolean isKingInDangerAfterMove(Piece piece, int endX, int endY) {
+        int startX = piece.x; int startY = piece.y;
+        Piece originalTarget = grid[endY][endX];
+        grid[startY][startX] = null;
+        grid[endY][endX] = piece;
+        piece.x = endX; piece.y = endY;
+        boolean inDanger = isKingChecked(piece.isRed);
+        piece.x = startX; piece.y = startY;
+        grid[startY][startX] = piece;
+        grid[endY][endX] = originalTarget;
+        return inDanger;
+    }
+
     private boolean isKingChecked(boolean isRed) {
-        // A. Tìm vị trí Tướng của phe mình
         int kingX = -1, kingY = -1;
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 9; x++) {
                 Piece p = grid[y][x];
                 if (p != null && p.isRed == isRed && p instanceof General) {
-                    kingX = x;
-                    kingY = y;
-                    break;
+                    kingX = x; kingY = y; break;
                 }
             }
         }
-
-        // (Trường hợp hiếm: Không tìm thấy tướng -> coi như thua/bị chiếu)
         if (kingX == -1) return true;
-
-        // B. Duyệt tất cả quân địch, xem có con nào ăn được Tướng mình không
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 9; x++) {
                 Piece p = grid[y][x];
-                // Nếu là quân địch
                 if (p != null && p.isRed != isRed) {
-                    // Nếu quân địch này có thể đi đến vị trí Tướng -> BỊ CHIẾU!
-                    if (p.isValidMove(kingX, kingY, this)) {
-                        return true;
-                    }
+                    if (p.isValidMove(kingX, kingY, this)) return true;
                 }
             }
         }
-
-        // C. Kiểm tra luật "Lộ mặt tướng" (Hai tướng nhìn thấy nhau)
-        // Tìm Tướng địch
         int enemyKingX = -1, enemyKingY = -1;
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 9; x++) {
                 Piece p = grid[y][x];
                 if (p != null && p.isRed != isRed && p instanceof General) {
-                    enemyKingX = x;
-                    enemyKingY = y;
-                    break;
+                    enemyKingX = x; enemyKingY = y; break;
                 }
             }
         }
-
-        // Nếu 2 tướng cùng cột và không có quân cản -> BỊ CHIẾU (Lộ mặt)
         if (kingX == enemyKingX) {
-            if (countObstacles(kingX, kingY, enemyKingX, enemyKingY) == 0) {
-                return true;
-            }
+            if (countObstacles(kingX, kingY, enemyKingX, enemyKingY) == 0) return true;
         }
-
-        return false; // An toàn
-    }
-
-    // ... (Hàm resetBoard, countObstacles, getFen... giữ nguyên như cũ) ...
-    public void resetBoard() {
-        grid = new Piece[10][9];
-        initStandardBoard();
-        isRedTurn = true;
-        gameOver = false;
-        lastSrcX = -1; lastSrcY = -1;
-        lastDstX = -1; lastDstY = -1;
+        return false;
     }
 
     public int countObstacles(int x1, int y1, int x2, int y2) {
         int count = 0;
         if (y1 == y2) {
-            int minX = Math.min(x1, x2);
-            int maxX = Math.max(x1, x2);
-            for (int k = minX + 1; k < maxX; k++) {
-                if (grid[y1][k] != null) count++;
-            }
+            int minX = Math.min(x1, x2); int maxX = Math.max(x1, x2);
+            for (int k = minX + 1; k < maxX; k++) { if (grid[y1][k] != null) count++; }
         } else if (x1 == x2) {
-            int minY = Math.min(y1, y2);
-            int maxY = Math.max(y1, y2);
-            for (int k = minY + 1; k < maxY; k++) {
-                if (grid[k][x1] != null) count++;
-            }
+            int minY = Math.min(y1, y2); int maxY = Math.max(y1, y2);
+            for (int k = minY + 1; k < maxY; k++) { if (grid[k][x1] != null) count++; }
         }
         return count;
     }
@@ -284,13 +210,9 @@ public class Board {
             int emptyCount = 0;
             for (int x = 0; x < 9; x++) {
                 Piece p = grid[y][x];
-                if (p == null) {
-                    emptyCount++;
-                } else {
-                    if (emptyCount > 0) {
-                        sb.append(emptyCount);
-                        emptyCount = 0;
-                    }
+                if (p == null) { emptyCount++; }
+                else {
+                    if (emptyCount > 0) { sb.append(emptyCount); emptyCount = 0; }
                     sb.append(getFenChar(p));
                 }
             }

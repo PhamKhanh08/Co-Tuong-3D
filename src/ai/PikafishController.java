@@ -24,14 +24,14 @@ public class PikafishController {
             // 1. Xác định thư mục chứa engine
             File engineDir = new File("engine");
             if (!engineDir.exists() || !engineDir.isDirectory()) {
-                System.err.println("❌ LỖI: Không tìm thấy thư mục 'engine' ngang hàng với 'src'!");
+                System.err.println("LỖI: Không tìm thấy thư mục 'engine' ngang hàng với 'src'!");
                 return false;
             }
 
             // 2. Tìm file exe
             File engineFile = new File(engineDir, "pikafish.exe");
             if (!engineFile.exists()) {
-                System.err.println("❌ LỖI: Không tìm thấy file pikafish.exe!");
+                System.err.println("LỖI: Không tìm thấy file pikafish.exe!");
                 return false;
             }
 
@@ -55,7 +55,7 @@ public class PikafishController {
                 // Gửi mỗi tên file thôi, AI sẽ tự tìm trong thư mục hiện tại của nó
                 sendCommand("setoption name EvalFile value pikafish.nnue");
             } else {
-                System.err.println("⚠️ CẢNH BÁO: Không tìm thấy file pikafish.nnue!");
+                System.err.println("CẢNH BÁO: Không tìm thấy file pikafish.nnue!");
             }
 
             sendCommand("isready");
@@ -75,7 +75,7 @@ public class PikafishController {
                     // System.out.println("AI LOG: " + line); // Bật dòng này nếu muốn debug sâu
                     if (line.startsWith("bestmove")) {
                         String move = line.split(" ")[1];
-                        System.out.println("✅ AI tìm ra nước đi: " + move);
+                        System.out.println("AI tìm ra nước đi: " + move);
                         bestMoveQueue.offer(move);
                     }
                 }
@@ -94,7 +94,7 @@ public class PikafishController {
                 System.out.println("Java gửi: " + command);
             }
         } catch (IOException e) {
-            System.err.println("❌ Lỗi gửi lệnh: " + e.getMessage());
+            System.err.println("Lỗi gửi lệnh: " + e.getMessage());
         }
     }
 
@@ -109,7 +109,7 @@ public class PikafishController {
             String bestMove = bestMoveQueue.poll(searchTime + 2000, TimeUnit.MILLISECONDS);
 
             if (bestMove == null) {
-                System.err.println("⚠️ AI không phản hồi! (Timeout)");
+                System.err.println("AI không phản hồi! (Timeout)");
             }
 
             return bestMove;
